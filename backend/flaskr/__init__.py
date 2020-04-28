@@ -9,15 +9,17 @@ from models import setup_db, Question, Category
 QUESTIONS_PER_PAGE = 10
 
 
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
     setup_db(app)
 
-    # TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
+
+    # TODO: DONE Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
     CORS(app)
 
-    # TODO: Use the after_request decorator to set Access-Control-Allow
+    # TODO: DONE Use the after_request decorator to set Access-Control-Allow
     @app.after_request
     def after_request(response):
         response.headers.add('Access-Control-Allow-Headers',
@@ -29,10 +31,10 @@ def create_app(test_config=None):
     # TODO: DONE Create an endpoint to handle GET requests for all available categories.
     @app.route('/categories', methods=['GET'])
     def get_categories():
-        categories = list(map(Category.format, Category.query.all()))
-        print(categories)
+        categories = Category.query.with_entities(Category.type).all()  
         result = {
             "success": True,
+            
             "categories": categories
         }
         return jsonify(result)
@@ -43,7 +45,7 @@ def create_app(test_config=None):
       This endpoint should return a list of questions,
       number of total questions, current category, categories.
 
-      TEST: At this point, when you start the application
+      TEST: DONE At this point, when you start the application
       you should see questions and categories generated,
       ten questions per page and pagination at the bottom of the screen for three pages.
       Clicking on the page numbers should update the questions.
@@ -67,54 +69,86 @@ def create_app(test_config=None):
         }
         return result
 
-        '''
-      # TODO: Create an endpoint to DELETE question using a question ID.
+    '''
+    # TODO: Create an endpoint to DELETE question using a question ID.
 
-      TEST: When you click the trash icon next to a question, the question will be removed.
-      This removal will persist in the database and when you refresh the page.
-      '''
+    TEST: When you click the trash icon next to a question, the question will be removed.
+    This removal will persist in the database and when you refresh the page.
+    '''
+    @app.route('/questions/<int:question_id>', methods=['DELETE'])
+    def delete_question(question_id):
+      try:
+        delete_entry = request.get_json()
+        question = Question.query.filter(Question.id==question_id).first()
 
-        '''
-  # TODO: Create an endpoint to POST a new question,
-  which will require the question and answer text,
-  category, and difficulty score.
+        question.delete()
+        questions = Question.query.with_entities(Question.id).all()
 
-  TEST: When you submit a question on the "Add" tab,
-  the form will clear and the question will appear at the end of the last page
-  of the questions list in the "List" tab.
-  '''
+        return jsonify({"success": True})
+      except:
+        return jsonify({"success": False})
 
-        '''
-  # TODO: Create a POST endpoint to get questions based on a search term.
-  It should return any questions for whom the search term
-  is a substring of the question.
+    '''
+    # TODO: Create an endpoint to POST a new question,
+    which will require the question and answer text,
+    category, and difficulty score.
 
-  TEST: Search by any phrase. The questions list will update to include
-  only question that include that string within their question.
-  Try using the word "title" to start.
-  '''
+    TEST: When you submit a question on the "Add" tab,
+    the form will clear and the question will appear at the end of the last page
+    of the questions list in the "List" tab.
+    '''
+    @app.route('/questions', methods=['POST'])
+    def create_question():
+      error = False
+      try:
+        new_request = request.get_json()
+        question = new_request['question']
+        answer = new_request['answer']
+        difficulty = new_request['difficulty']
+        category = new_request['category']
 
-        '''
-  # TODO: Create a GET endpoint to get questions based on category.
+        new_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
+        new_question.insert()
 
-  TEST: In the "List" tab / main screen, clicking on one of the
-  categories in the left column will cause only questions of that
-  category to be shown.
-  '''
-        '''
-  # TODO: Create a POST endpoint to get questions to play the quiz.
-  This endpoint should take category and previous question parameters
-  and return a random questions within the given category,
-  if provided, and that is not one of the previous questions.
+        return jsonify({'success': True, "message": "Question successful added"})
 
-  TEST: In the "Play" tab, after a user selects "All" or a category,
-  one question at a time is displayed, the user is allowed to answer
-  and shown whether they were correct or not.
-  '''
+      except:
+        error = True
+      if error:
+        return jsonify({"error" : True, "message": "An error has occured"})
+      
 
-        '''
-  # TODO: Create error handlers for all expected errors
-  including 404 and 422.
-  '''
+    '''
+    # TODO: Create a POST endpoint to get questions based on a search term.
+    It should return any questions for whom the search term
+    is a substring of the question.
+
+    TEST: Search by any phrase. The questions list will update to include
+    only question that include that string within their question.
+    Try using the word "title" to start.
+    '''
+
+    '''
+    # TODO: Create a GET endpoint to get questions based on category.
+
+    TEST: In the "List" tab / main screen, clicking on one of the
+    categories in the left column will cause only questions of that
+    category to be shown.
+    '''
+    '''
+    # TODO: Create a POST endpoint to get questions to play the quiz.
+    This endpoint should take category and previous question parameters
+    and return a random questions within the given category,
+    if provided, and that is not one of the previous questions.
+
+    TEST: In the "Play" tab, after a user selects "All" or a category,
+    one question at a time is displayed, the user is allowed to answer
+    and shown whether they were correct or not.
+    '''
+
+    '''
+    # TODO: Create error handlers for all expected errors
+    including 404 and 422.
+    '''
 
     return app

@@ -26,6 +26,13 @@ class TriviaTestCase(unittest.TestCase):
             # create all tables
             self.db.create_all()
 
+        self.new_question= {
+            'question': 'Is this a unittest?',
+            'answer' : 'Yes, it is!',
+            'difficulty': 2,
+            'category': 'Science'
+        }
+   
     def tearDown(self):
         """Executed after reach test"""
         # print('----------------')
@@ -53,6 +60,9 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
 
+    def test_post_question(self):
+        res = self.client().post('/questions', json=self.new_question)
+        data=json.loads(res.data)
         # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()

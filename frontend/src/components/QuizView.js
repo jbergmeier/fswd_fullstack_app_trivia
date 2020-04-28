@@ -83,7 +83,7 @@ class QuizView extends Component {
   submitGuess = (event) => {
     event.preventDefault();
     const formatGuess = this.state.guess
-      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+      .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "")
       .toLowerCase();
     let evaluate = this.evaluateAnswer();
     this.setState({
@@ -148,7 +148,7 @@ class QuizView extends Component {
 
   evaluateAnswer = () => {
     const formatGuess = this.state.guess
-      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+      .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "")
       .toLowerCase();
     const answerArray = this.state.currentQuestion.answer
       .toLowerCase()
@@ -158,7 +158,7 @@ class QuizView extends Component {
 
   renderCorrectAnswer() {
     const formatGuess = this.state.guess
-      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+      .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "")
       .toLowerCase();
     let evaluate = this.evaluateAnswer();
     return (
