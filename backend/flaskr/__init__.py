@@ -77,6 +77,7 @@ def create_app(test_config=None):
     '''
     @app.route('/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
+      print(request.base_url)
       try:
         delete_entry = request.get_json()
         question = Question.query.filter(Question.id==question_id).first()
@@ -84,8 +85,9 @@ def create_app(test_config=None):
         question.delete()
         questions = Question.query.with_entities(Question.id).all()
 
-        return jsonify({"success": True})
+        return redirect(url_for(request.url))
       except:
+        
         return jsonify({"success": False})
 
     '''
@@ -135,6 +137,26 @@ def create_app(test_config=None):
     categories in the left column will cause only questions of that
     category to be shown.
     '''
+    @app.route('/categories/<int:category_id>/questions')
+    def questions_category(category_id):
+      # Define Start and End for Pagination
+        page = request.args.get('page', 1, type=int)
+        page_start = (page - 1) * QUESTIONS_PER_PAGE
+        page_end = page_start + QUESTIONS_PER_PAGE
+        # Get Data from DB
+        questions = list(map(Question.format, Question.query.filter(Question.category == category_id)))
+        categories = Category.query.filter(Category.id == category_id).with_entities(Category.type).all()
+        total_number_questions = Question.query.filter(Question.category == category_id).count()
+
+        result = {
+            "success": True,
+            "questions": questions[page_start:page_end],
+            "total_questions": total_number_questions,
+            "categories": categories
+        }
+        return result
+
+
     '''
     # TODO: Create a POST endpoint to get questions to play the quiz.
     This endpoint should take category and previous question parameters

@@ -143,7 +143,7 @@ class QuestionView extends Component {
               <li
                 key={id}
                 onClick={() => {
-                  this.getByCategory(id);
+                  this.getByCategory(parseInt(id) + 1);
                 }}
               >
                 {this.state.categories[id]}
@@ -164,7 +164,7 @@ class QuestionView extends Component {
               key={q.id}
               question={q.question}
               answer={q.answer}
-              category={this.state.categories[q.category]}
+              category={this.state.categories[parseInt(q.category) - 1]} // Changed ID to fit Image
               difficulty={q.difficulty}
               questionAction={this.questionAction(q.id)}
             />
