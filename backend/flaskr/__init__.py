@@ -65,12 +65,12 @@ def create_app(test_config=None):
         categories = Category.query.with_entities(Category.type).all()
         total_number_questions = Question.query.count()
 
-        result = {
+        result = jsonify({
             "success": True,
             "questions": questions[page_start:page_end],
             "total_questions": total_number_questions,
             "categories": categories
-        }
+        })
         return result
       except:
         abort(422)
@@ -89,7 +89,10 @@ def create_app(test_config=None):
         question.delete()
         questions = Question.query.with_entities(Question.id).all()
 
-        return jsonify({"success": True}) #return redirect(url_for(request.url))
+        return jsonify({
+          "success": True, 
+          "id_deleted": question_id
+          }) #return redirect(url_for(request.url))
       except:
         abort(422)
 
@@ -154,12 +157,12 @@ def create_app(test_config=None):
         # get total Number of Questions (after search)
         total_number_questions = Question.query.filter(Question.question.ilike(search_term)).count()
         
-        result = {
+        result = jsonify({
             "success": True,
             "questions": questions,
             "total_questions": total_number_questions,
             "categories": categories
-        }
+        })
         return result
 
       except:
@@ -182,12 +185,12 @@ def create_app(test_config=None):
         if(categories == []):
           abort(404)
 
-        result = {
+        result = jsonify({
             "success": True,
             "questions": questions,
             "total_questions": total_number_questions,
             "categories": categories
-        }
+        })
         return result
       
       except:
