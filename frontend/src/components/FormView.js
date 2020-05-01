@@ -54,7 +54,8 @@ class FormView extends Component {
         return;
       },
       error: (error) => {
-        alert("Unable to add question. Please try your request again");
+        document.getElementById("create_message").innerText =
+          "An error occured!";
         return;
       },
     });

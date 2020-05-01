@@ -35,10 +35,10 @@ def create_app(test_config=None):
         categories = Category.query.with_entities(Category.type).all()  
         result = {
             "success": True,
-            
             "categories": categories
         }
         return jsonify(result)
+        
       except:
         abort(422)
 
@@ -106,6 +106,10 @@ def create_app(test_config=None):
     def create_question():
       try:
         new_request = request.get_json()
+        print(new_request)
+        if(new_request['question'] == '' or new_request['answer'] == ''):
+          abort(422)
+
         question = new_request['question']
         answer = new_request['answer']
         difficulty = new_request['difficulty']
@@ -190,12 +194,12 @@ def create_app(test_config=None):
         abort(422)
 
     '''
-    # TODO: Create a POST endpoint to get questions to play the quiz.
+    # TODO: DONE Create a POST endpoint to get questions to play the quiz.
     This endpoint should take category and previous question parameters
     and return a random questions within the given category,
     if provided, and that is not one of the previous questions.
 
-    TEST: In the "Play" tab, after a user selects "All" or a category,
+    TEST: DONE In the "Play" tab, after a user selects "All" or a category,
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.
     '''
@@ -203,19 +207,30 @@ def create_app(test_config=None):
     @app.route('/quizzes', methods=['POST'])
     def post_quizzes():
       try:
+        # Gather data
         data = request.get_json()
-        print(data)
+        category_id = data['quiz_category']['id']
+        previous_questions = data['previous_questions']
 
-        data = request.get_json()
-        # check given category
-        category_id = int(data["quiz_category"]["id"])
-        category = Category.query.get(category_id)
+        #Check if catepgry is set, if yes, which category
+        if(category_id == 0):
+          questions = Question.query.filter(Question.id.notin_(previous_questions)).all()
+        else:
+          questions = Question.query.filter(Question.category == category_id).filter(Question.id.notin_(previous_questions)).all()
+          print(questions)
 
-        print(category_id)
-        print(category)
-
-
-        return result
+        # checks if questions are still available. If not, send None to end the game
+        if questions == []:
+          next_question = None
+        else:
+          new_question = random.choices(questions, k=1)
+          next_question = (Question.query.filter_by(id = new_question[0].id).one_or_none()).format()
+        
+        # Return to Frontend
+        return jsonify({
+          "success": True,
+          "question": next_question
+        })
 
       except:
         abort(422)

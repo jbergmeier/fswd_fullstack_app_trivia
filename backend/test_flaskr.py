@@ -33,10 +33,26 @@ class TriviaTestCase(unittest.TestCase):
             'difficulty': 2,
             'category': 1
         }
+
+        # Missing Question
+        self.error_new_question = {
+            'question': '', 
+            'answer': '', 
+            'difficulty': 1, 
+            'category': 1
+        }
         
         self.search_questions = {
             'searchTerm': 'What'
         }
+
+        self.quiz = {
+            "previous_questions": [10], 
+            "quiz_category": {
+                "type": ["Sports"], 
+                    "id": "6"
+	}
+}
    
     def tearDown(self):
         """Executed after reach test"""
@@ -64,7 +80,7 @@ class TriviaTestCase(unittest.TestCase):
     # Questions GET/POST
     # ##################################
 
-    def test_2_post_question(self):
+    def test_2a_post_question(self):
         print('##### Check POST questions/ Endpoint #####')
         res = self.client().post('/questions', json=self.new_question)
         data=json.loads(res.data)
@@ -75,8 +91,14 @@ class TriviaTestCase(unittest.TestCase):
         last_entry = (Question.query.with_entities(Question.question).order_by(Question.id.desc()).first())
         self.assertTrue(last_entry[0], self.new_question['question'])
 
+    def test_2b_post_question(self):
+        print('##### Check POST questions/ Endpoint FAIL with missing fields #####')
+        res = self.client().post('/questions', json=self.error_new_question)
+        data=json.loads(res.data)
 
-    def test_2a_get_questions(self):
+        self.assertEqual(res.status_code, 422)
+
+    def test_2c_get_questions(self):
         print('##### Check GET questions/ Endpoint #####')
         res = self.client().get('/questions')
         data = json.loads(res.data)
@@ -112,11 +134,18 @@ class TriviaTestCase(unittest.TestCase):
 
     
     # ##################################
-    # Delete Questions
+    # Quizz Questions
     # ##################################   
 
-    def test_4_quizz
+    def test_4_post_quizz(self):
+        print('##### Check POST /quizzes Endpoint #####')
+        res = self.client().post('/quizzes', json=self.quiz)
+        data=json.loads(res.data)
+        questions = Question.query.filter(Question.category == self.quiz['quiz_category']['id']).filter(Question.id.notin_(self.quiz['previous_questions'])).all()
 
+        self.assertNotIn(self.quiz['previous_questions'], questions)
+        self.assertEqual(res.status_code, 200)
+        
     # ##################################
     # Delete Questions
     # ##################################   
@@ -162,7 +191,6 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)   
-
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
