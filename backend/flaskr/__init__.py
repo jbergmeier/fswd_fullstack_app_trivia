@@ -16,10 +16,10 @@ def create_app(test_config=None):
     setup_db(app)
 
 
-    # TODO: DONE Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
+    # DONE: DONE Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
     CORS(app)
 
-    # TODO: DONE Use the after_request decorator to set Access-Control-Allow
+    # DONE: DONE Use the after_request decorator to set Access-Control-Allow
     @app.after_request
     def after_request(response):
         response.headers.add('Access-Control-Allow-Headers',
@@ -28,7 +28,7 @@ def create_app(test_config=None):
                              'GET, POST, PATCH, DELETE, OPTIONS')
         return response
 
-    # TODO: DONE Create an endpoint to handle GET requests for all available categories.
+    # DONE: DONE Create an endpoint to handle GET requests for all available categories.
     @app.route('/categories', methods=['GET'])
     def get_categories():
       try:
@@ -43,7 +43,7 @@ def create_app(test_config=None):
         abort(422)
 
       '''
-      # TODO: DONE Create an endpoint to handle GET requests for questions,
+      # DONE: DONE Create an endpoint to handle GET requests for questions,
       including pagination (every 10 questions).
       This endpoint should return a list of questions,
       number of total questions, current category, categories.
@@ -64,7 +64,8 @@ def create_app(test_config=None):
         questions = list(map(Question.format, Question.query.all()))
         categories = Category.query.with_entities(Category.type).all()
         total_number_questions = Question.query.count()
-
+        test = Question.query.paginate(page=page, per_page=QUESTIONS_PER_PAGE, error_out=True, max_per_page=QUESTIONS_PER_PAGE)
+        print(test)
         result = jsonify({
             "success": True,
             "questions": questions[page_start:page_end],
@@ -76,7 +77,7 @@ def create_app(test_config=None):
         abort(422)
 
     '''
-    # TODO: DONE Create an endpoint to DELETE question using a question ID.
+    # DONE: DONE Create an endpoint to DELETE question using a question ID.
 
     TEST: DONE When you click the trash icon next to a question, the question will be removed.
     This removal will persist in the database and when you refresh the page.
@@ -97,7 +98,7 @@ def create_app(test_config=None):
         abort(422)
 
     '''
-    # TODO: DONE Create an endpoint to POST a new question,
+    # DONE: DONE Create an endpoint to POST a new question,
     which will require the question and answer text,
     category, and difficulty score.
 
@@ -128,7 +129,7 @@ def create_app(test_config=None):
       
 
     '''
-    # TODO: DONE Create a POST endpoint to get questions based on a search term.
+    # DONE: DONE Create a POST endpoint to get questions based on a search term.
     It should return any questions for whom the search term
     is a substring of the question.
 
@@ -169,7 +170,7 @@ def create_app(test_config=None):
         abort(422)
 
     '''
-    # TODO: DONE Create a GET endpoint to get questions based on category.
+    # DONE: DONE Create a GET endpoint to get questions based on category.
     TEST: DONE In the "List" tab / main screen, clicking on one of the
     categories in the left column will cause only questions of that
     category to be shown.
@@ -197,7 +198,7 @@ def create_app(test_config=None):
         abort(422)
 
     '''
-    # TODO: DONE Create a POST endpoint to get questions to play the quiz.
+    # DONE: DONE Create a POST endpoint to get questions to play the quiz.
     This endpoint should take category and previous question parameters
     and return a random questions within the given category,
     if provided, and that is not one of the previous questions.
@@ -238,7 +239,7 @@ def create_app(test_config=None):
       except:
         abort(422)
     '''
-    # TODO: DONE Create error handlers for all expected errors
+    # DONE: DONE Create error handlers for all expected errors
     including 404 and 422.
     '''
     @app.errorhandler(404)
